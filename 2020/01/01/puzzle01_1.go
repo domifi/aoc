@@ -44,7 +44,7 @@ func findSum(ints []int, sum int) (int, int, error) {
 }
 
 func main() {
-	file, err := os.Open("input")
+	file, err := os.Open("../input")
 	check(err)
 	ints, err := readInts(file)
 	check(err)
