@@ -1,4 +1,33 @@
+module mod
+    implicit none
+
+    private
+    public num_nums
+
+contains
+    ! num_nums counts the elements in a comma separated string. "1,23" -> 2
+    pure function num_nums(str) result(n)
+        implicit none
+        character(*), intent(in) :: str
+        integer :: i
+        integer :: n
+
+        n = 1
+        do i = 1, len(str)
+            if (str(i:i) == ',') then
+                n = n + 1
+            end if
+        end do
+
+        if (len(str) == 0) then
+            n = 0
+        end if
+    end function
+
+end module mod
+
 program aoc21_04a
+    use mod
     implicit none
 
     integer :: FID = 9
@@ -9,7 +38,7 @@ program aoc21_04a
     character(:), allocatable :: PATH
 
     integer :: num_lines = -1
-    integer :: sequence(256)
+    integer, allocatable :: sequence(:)
 
     ! check number of cli arguments and get the argument:
     if (command_argument_count() /= 1) THEN
@@ -29,10 +58,12 @@ program aoc21_04a
         read(FID, *, iostat=IERR) TMP
     end do
 
-    ! find out number of digits per line
+    ! find out length of sequence and read it
     rewind(FID)
-    read(FID, *) sequence
-    print *, sequence
+    read(FID, "(A)") TMP
+    allocate(integer :: sequence(num_nums(trim(TMP))))
+    read(TMP, *) sequence
+
 
     close(FID)
 
