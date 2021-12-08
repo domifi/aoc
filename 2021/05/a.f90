@@ -8,10 +8,10 @@ contains
         integer, intent(in) :: line(4)
         integer :: start_x, end_x, start_y, end_y
 
-        start_x = min(line(1), line(3))
-        end_x   = max(line(1), line(3))
-        start_y = min(line(2), line(4))
-        end_y   = max(line(2), line(4))
+        start_x = min(line(1), line(3)) + 1
+        end_x   = max(line(1), line(3)) + 1
+        start_y = min(line(2), line(4)) + 1
+        end_y   = max(line(2), line(4)) + 1
 
         if (start_x == end_x .or. start_y == end_y) then
             area(start_x : end_x, start_y:end_y) = 1 + area(start_x : end_x, start_y:end_y)
