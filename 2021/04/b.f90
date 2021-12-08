@@ -41,7 +41,7 @@ contains
         implicit none
         integer, intent(in) :: board(:,:)
         integer, intent(in) :: n
-        logical, intent(inout) :: marks(:,:)
+        logical, intent(out) :: marks(:,:)
         integer :: i(rank(board))
         i = findloc(board, n)
         if (.not. all(i == 0)) then
