@@ -1,8 +1,6 @@
 program aoc21_04a
     implicit none
 
-    use delim
-
     integer :: FID = 9
     integer :: IERR = 0
     integer :: ARG_LEN ! how long the arg (path is)
@@ -11,7 +9,7 @@ program aoc21_04a
     character(:), allocatable :: PATH
 
     integer :: num_lines = -1
-    integer, allocatable :: sequence(:)
+    integer :: sequence(256)
 
     ! check number of cli arguments and get the argument:
     if (command_argument_count() /= 1) THEN
@@ -33,12 +31,9 @@ program aoc21_04a
 
     ! find out number of digits per line
     rewind(FID)
-    read(FID, "") sequence
+    read(FID, *) sequence
     print *, sequence
 
-
-
     close(FID)
-
 
 end program aoc21_04a
