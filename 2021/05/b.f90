@@ -26,7 +26,7 @@ contains
             ! diagonal lines
             xi = start_x
             yi = start_y
-            do i = 0, abs(start_x-end_x), 1
+            do i = 0, abs(start_x-end_x)
                 area(start_x+(i*incr_x),start_y+(i*incr_y)) = 1 + area(start_x+(i*incr_x),start_y+(i*incr_y))
             end do
         end if
