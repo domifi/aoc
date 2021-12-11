@@ -7,7 +7,7 @@ contains
         integer, intent(in) :: x, y
         integer, intent(in) :: arr(:,:)
         logical b
-        integer :: xa, xb, ya, yb
+        integer :: xa, xb, ya, yb, xy
         if (x <= 1) then
             xa = 9
         else
@@ -32,7 +32,8 @@ contains
             yb = arr(x,y+1)
         end if
 
-        b = arr(x,y) == min(xa,xb,ya,yb,arr(x,y))
+        xy = arr(x,y)
+        b = xa > xy .and. xb > xy .and. ya > xy .and. yb > xy
         ! todo
     end function
 end module mod
