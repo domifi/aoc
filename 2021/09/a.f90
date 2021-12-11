@@ -4,21 +4,37 @@ module mod
 contains
 
     pure function height(x, y, arr) result(b)
-    integer, intent(in) :: x, y
-    integer, intent(in) :: arr(:,:)
-    logical b
-    integer :: xa, xb, ya, yb
-    if (x < 1) then
-        xa = 9
-    else if (size(arr,1) < x) then
-        xb = 9
-    end if
-    if (y < 1) then
-        ya = 9
-    else if (size(arr,2) < y) then
-        yb = 9
-    end if
-    ! todo
+        integer, intent(in) :: x, y
+        integer, intent(in) :: arr(:,:)
+        logical b
+        integer :: xa, xb, ya, yb
+        if (x <= 1) then
+            xa = 9
+        else
+            xa = arr(x-1,y)
+        end if
+
+        if (size(arr,1) <= x) then
+            xb = 9
+        else
+            xb = arr(x+1,y)
+        end if
+
+        if (y <= 1) then
+            ya = 9
+        else
+            ya = arr(x,y-1)
+        end if
+
+        if (size(arr,2) <= y) then
+            yb = 9
+        else
+            yb = arr(x,y+1)
+        end if
+
+        b = arr(x,y) == min(xa,xb,ya,yb,arr(x,y))
+        ! todo
+    end function
 end module mod
 
 program aoc21_09a
@@ -30,10 +46,11 @@ program aoc21_09a
     integer :: ARG_LEN ! how long the arg (path is)
     character(200) :: TMP ! somewhere to read the lines to
     character(:), allocatable :: PATH
-    integer :: I, LENGTH
+    integer :: I, J, LENGTH
 
     integer :: num_lines = -1
     integer, allocatable :: map(:,:)
+    logical, allocatable :: min_mask(:,:)
 
 
     ! check number of cli arguments and get the argument:
@@ -63,6 +80,7 @@ program aoc21_09a
     ! read input
     rewind(FID)
     allocate(integer :: map(LENGTH, num_lines))
+    allocate(logical :: min_mask(LENGTH, num_lines))
     write(TMP, *) LENGTH
     do I = 1, num_lines
         read(FID, "("//trim(adjustl(TMP))//"(I1))") map(:,I)
@@ -71,7 +89,12 @@ program aoc21_09a
     close(FID)
 
     ! do stuff
-    print *, map(11,5)
+    do I = 1, size(min_mask, 1)
+        do J = 1, size(min_mask, 2)
+            min_mask(I,J) = height(I,J,map)
+        end do
+    end do
 
+    print *, sum(map+1, mask=min_mask)
 
 end program aoc21_09a
