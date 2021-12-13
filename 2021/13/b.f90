@@ -71,7 +71,7 @@ program aoc21_13b
         paper(paper_lines(1,I), paper_lines(2,I)) = .true.
     end do
 
-    ! fold once
+    ! fold
     do I = 1, num_fold_instructions
         SEAM = fold_instructions(1,I)
         if (achar(fold_instructions(2,I)) == 'x') then
