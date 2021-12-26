@@ -112,7 +112,7 @@ contains
     end subroutine bubble_sort
 end module my_mod
 
-program aoc21_10a
+program aoc21_10b
     use char_stack
     use my_mod
     implicit none
@@ -193,4 +193,4 @@ program aoc21_10a
     call bubble_sort(TMP_ARR)
     print *, TMP_ARR(size(TMP_ARR) / 2 + 1)
 
-end program aoc21_10a
+end program aoc21_10b
