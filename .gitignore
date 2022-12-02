@@ -1,5 +1,2 @@
-**/*.code-workspace
-**/*.out
+*.code-workspace
 .vscode
-**/*.mod
-**/*.o
