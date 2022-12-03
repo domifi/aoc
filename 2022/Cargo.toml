@@ -6,3 +6,7 @@ authors = [ "Dominik" ]
 [[bin]]
 name = "01a"
 path = "01/a.rs"
+
+[[bin]]
+name = "01b"
+path = "01/b.rs"
