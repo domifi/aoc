@@ -8,7 +8,7 @@ fn main() {
     let mut accumulator = 0;
 
     for line in input.iter() {
-        if line.len() == 0 {
+        if line.is_empty() {
             if accumulator > max {
                 max = accumulator;
             }
