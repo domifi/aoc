@@ -1,0 +1,8 @@
+[package]
+name = "AoC22"
+version = "1.0.0"
+authors = [ "Dominik" ]
+
+[[bin]]
+name = "01a"
+path = "01/a.rs"
