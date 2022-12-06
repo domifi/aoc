@@ -2,25 +2,20 @@ use std::io;
 use std::io::BufRead;
 
 
+#[derive(Debug)]
 struct Section (u64, u64);
 
 fn main() {
-    let input: Vec<Vec<_>> = io::stdin()
+    let pairs: Vec<_> = io::stdin()
         .lock()
         .lines()
-        .map(|l|
-            l.unwrap()
-            .split(',')
-            .map(|pair| pair.to_string())
-            .collect())
+        .map(|l| line2pair(l.unwrap()))
         .collect();
 
-    let pairs: Vec<(Section, Section)> = input
-        .iter()
-        .map(|pair| {
-            let foo = pair.iter().map(|f| f.split('-'));
-            //(foo.next().unwrap(), foo.next().unwrap())
-        }).collect();
+    println!("{:?}", pairs)
+}
 
-    println!("{:?}", input)
+fn line2pair(l: String) -> (Section, Section) {
+    let numbers: Vec<u64> = l.split(&[',', '-'][..]).map(|e| e.parse().unwrap()).collect();
+    (Section(numbers[0], numbers[1]), Section(numbers[2], numbers[3]))
 }
