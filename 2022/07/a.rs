@@ -58,39 +58,20 @@ impl Directory {
                 Operation::Cd(dir) => match dir.as_str() {
                     "/" => (),
                     ".." => break,
-                    // name => self.directories.push(
-                    //     Directory {
-                    //         name: name.to_owned(),
-                    //         files: vec![],
-                    //         directories: vec![],
-                    //     }
-                    //     .apply_ops(ops),
-                    // ),
                     name => self.directories.push(Directory::new(name).apply_ops(ops)),
                 },
                 Operation::Ls(inodes) => inodes.iter().for_each(|i| self.add(i)),
-                _ => (),
             }
         }
         self
-        // match ops.next() {
-        //     Some(Operation::Ls(inodes)) => {
-        //         inodes
-        //             .iter()
-        //             .for_each(|i| self.add(i));
-        //         self.apply_ops(ops)
-        //     },
-        //     Some(Operation::Cd(target)) if target.eq("..") => ops,
-        //     Some(Operation::Cd(target)) => { //self.directories.iter().find(|d| d.name.eq(target)).unwrap().apply_ops(ops),
-        //         for dir in self.directories.iter() {
-        //             if dir.name.to_string().eq(&target) {
-        //                 return dir.clone().apply_ops(ops);
-        //             }
-        //         }
-        //         panic!("Fuck this");
-        //     },
-        //     None => ops,
-        // }
+    }
+
+    fn dir_sizes(&self) -> Vec<u64> {
+        let mut subdirs = self.directories.iter().map(|dir| dir.dir_sizes()).flatten().collect::<Vec<_>>();
+        let this_dir = self.files.iter().map(|f| f.size()).sum::<u64>()
+            + subdirs.iter().sum::<u64>();
+        subdirs.push(this_dir);
+        subdirs
     }
 
 }
@@ -164,5 +145,6 @@ fn main() {
     let mut filesystem = Directory::new("/");
     filesystem = filesystem.apply_ops(&mut ops.into_iter());
 
-    println!("{:#?}", filesystem)
+    let sizes = filesystem.dir_sizes();
+    println!("{}", sizes.iter().filter(|&&s| s <= 100_000).sum::<u64>())
 }
