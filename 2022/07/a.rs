@@ -1,4 +1,4 @@
-use std::io;
+use std::{io, clone};
 use std::io::BufRead;
 
 #[derive(Debug)]
@@ -13,29 +13,66 @@ impl File {
     }
 }
 
-#[derive(Debug)]
-struct Directory<'a> {
-    name: &'a str,
-    files: Vec<File>,
-    directories: Vec<Directory<'a>>,
+impl Clone for File {
+    fn clone(&self) -> Self {
+        File::new(&self.name, self.size)
+    }
 }
 
-impl Directory<'_> {
+#[derive(Debug)]
+struct Directory {
+    name: String,
+    files: Vec<File>,
+    directories: Vec<Directory>,
+}
+
+impl Clone for Directory {
+    fn clone(&self) -> Self {
+        Directory {
+            name: self.name.clone(),
+            files: self.files.clone(),
+            directories: self.directories.clone()
+        }
+    }
+}
+
+impl Directory {
     fn new(name: &str) -> Directory {
         Directory {
-            name,
+            name: name.to_owned(),
             files: Vec::new(),
             directories: Vec::new(),
         }
     }
 
+    fn add(&mut self, inode: &Inode) {
+        match inode {
+            Inode::File(f) => self.files.push(f.clone()),
+            Inode::Dir(d) => self.directories.push(d.clone()),
+        }
+    }
+
+    // fn apply_op(&mut self, ops: &Vec<Operation>) {
+    //     match op.next() {
+    //         Operation::Ls(inodes) => inodes.iter().for_each(|i| self.add(i)),
+    //         Operation::Cd(target) => self.directories.iter().find(|d| d.name.eq(target)).unwrap().apply_op(op),
+    //         Err(_)
+    //     }
+    // }
+
 }
 
-trait Inode {
+trait Size {
     fn size(&self) -> u64;
 }
 
-impl Inode for Directory<'_> {
+#[derive(Debug,Clone)]
+enum Inode {
+    Dir(Directory),
+    File(File),
+}
+
+impl Size for Directory {
     fn size(&self) -> u64 {
         self.files.iter().map(|f| f.size()).sum::<u64>()
         +
@@ -43,17 +80,54 @@ impl Inode for Directory<'_> {
     }
 }
 
-impl Inode for File {
+// impl Size for Inode {
+//     fn size(&self) -> u64 {
+//         self.size()
+//     }
+// }
+
+impl Size for File {
     fn size(&self) -> u64 {
         self.size
     }
+}
+
+#[derive(Debug)]
+enum Operation {
+    Cd(String),
+    Ls(Vec<Inode>),
 }
 
 fn main() {
     let input = io::stdin()
         .lock()
         .lines()
-        .map(|l| l.unwrap());
+        .map(|l| l.unwrap())
+        .filter(|l| !l.eq("$ ls"));
+
+    let mut ops: Vec<Operation> = Vec::new();
+    let mut ls: Vec<Inode> = Vec::new();
+    for line in input {
+        let split = line.split_whitespace().collect::<Vec<_>>();
+        match split[0] {
+            "$" => {
+                if !ls.is_empty() {
+                    ops.push(Operation::Ls(ls));
+                    ls = Vec::new();
+                }
+                ops.push(Operation::Cd(split[2].to_owned()))
+            },
+            "dir" => ls.push(Inode::Dir(Directory::new(split[1]))),
+            _ => {
+                let size = split[0].parse().unwrap();
+                ls.push(Inode::File(File::new(split[1], size)))
+            },
+        }
+    }
+    if !ls.is_empty() {
+        ops.push(Operation::Ls(ls));
+    }
+
 
     let mut filesystem = Directory::new("/");
 
@@ -67,5 +141,8 @@ fn main() {
     // }
 
 
-    println!("{:?}", input.collect::<Vec<_>>())
+    //println!("{:?}", ops)
+    for op in ops {
+        println!("{:?}", op)
+    }
 }
