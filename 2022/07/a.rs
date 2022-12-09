@@ -58,7 +58,19 @@ impl Directory {
                 Operation::Cd(dir) => match dir.as_str() {
                     "/" => (),
                     ".." => break,
-                    name => self.directories.push(Directory::new(name).apply_ops(ops)),
+                    // name => self.directories.push(Directory::new(name).apply_ops(ops)),
+                    name => {
+                        let found = self
+                            .directories
+                            .swap_remove(self
+                                .directories
+                                .iter()
+                                .position(|d| d.name.eq(name)
+                            ).unwrap()
+                        );
+
+                    self.directories.push(found.apply_ops(ops))
+                    },
                 },
                 Operation::Ls(inodes) => inodes.iter().for_each(|i| self.add(i)),
             }
@@ -141,4 +153,5 @@ fn main() {
     let sizes = filesystem.dir_sizes();
 
     println!("{:?}", sizes.iter().filter(|&&s| s <= 100_000).sum::<u64>())
+    // println!("{:?}", sizes.iter().collect::<Vec<_>>())
 }
