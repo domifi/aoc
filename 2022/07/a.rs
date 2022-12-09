@@ -1,4 +1,4 @@
-use std::{io, clone};
+use std::io;
 use std::io::BufRead;
 
 #[derive(Debug)]
@@ -52,13 +52,26 @@ impl Directory {
         }
     }
 
-    // fn apply_op(&mut self, ops: &Vec<Operation>) {
-    //     match op.next() {
-    //         Operation::Ls(inodes) => inodes.iter().for_each(|i| self.add(i)),
-    //         Operation::Cd(target) => self.directories.iter().find(|d| d.name.eq(target)).unwrap().apply_op(op),
-    //         Err(_)
-    //     }
-    // }
+    fn apply_ops(&mut self, mut ops: impl Iterator<Item=Operation>) -> impl Iterator<Item=Operation>{
+        match ops.next() {
+            Some(Operation::Ls(inodes)) => {
+                inodes
+                    .iter()
+                    .for_each(|i| self.add(i));
+                self.apply_ops(ops)
+            },
+            Some(Operation::Cd(target)) if target.eq("..") => ops,
+            Some(Operation::Cd(target)) => { //self.directories.iter().find(|d| d.name.eq(target)).unwrap().apply_ops(ops),
+                for dir in self.directories.iter() {
+                    if dir.name.to_string().eq(&target) {
+                        return dir.clone().apply_ops(ops);
+                    }
+                }
+                panic!("Fuck this");
+            },
+            None => ops,
+        }
+    }
 
 }
 
@@ -128,6 +141,8 @@ fn main() {
         ops.push(Operation::Ls(ls));
     }
 
+    let foo = ops.iter();
+
 
     let mut filesystem = Directory::new("/");
 
@@ -139,6 +154,8 @@ fn main() {
     //         }
     //     }
     // }
+    let foo = ops.iter().map(|op| op);
+    filesystem.apply_ops(foo);
 
 
     //println!("{:?}", ops)
