@@ -67,7 +67,7 @@ impl Directory {
     }
 
     fn dir_sizes(&self) -> Vec<u64> {
-        let mut subdirs = self.directories.iter().map(|dir| dir.dir_sizes()).flatten().collect::<Vec<_>>();
+        let mut subdirs = self.directories.iter().flat_map(|dir| dir.dir_sizes()).collect::<Vec<_>>();
         let this_dir = self.files.iter().map(|f| f.size()).sum::<u64>()
             + subdirs.iter().sum::<u64>();
         subdirs.push(this_dir);
@@ -93,12 +93,6 @@ impl Size for Directory {
         self.directories.iter().map(|f| f.size()).sum::<u64>()
     }
 }
-
-// impl Size for Inode {
-//     fn size(&self) -> u64 {
-//         self.size()
-//     }
-// }
 
 impl Size for File {
     fn size(&self) -> u64 {
@@ -144,7 +138,7 @@ fn main() {
 
     let mut filesystem = Directory::new("/");
     filesystem = filesystem.apply_ops(&mut ops.into_iter());
-
     let sizes = filesystem.dir_sizes();
-    println!("{}", sizes.iter().filter(|&&s| s <= 100_000).sum::<u64>())
+
+    println!("{:?}", sizes.iter().filter(|&&s| s <= 100_000).sum::<u64>())
 }
