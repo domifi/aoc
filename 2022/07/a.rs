@@ -52,25 +52,45 @@ impl Directory {
         }
     }
 
-    fn apply_ops(&mut self, mut ops: impl Iterator<Item=Operation>) -> impl Iterator<Item=Operation>{
-        match ops.next() {
-            Some(Operation::Ls(inodes)) => {
-                inodes
-                    .iter()
-                    .for_each(|i| self.add(i));
-                self.apply_ops(ops)
-            },
-            Some(Operation::Cd(target)) if target.eq("..") => ops,
-            Some(Operation::Cd(target)) => { //self.directories.iter().find(|d| d.name.eq(target)).unwrap().apply_ops(ops),
-                for dir in self.directories.iter() {
-                    if dir.name.to_string().eq(&target) {
-                        return dir.clone().apply_ops(ops);
-                    }
-                }
-                panic!("Fuck this");
-            },
-            None => ops,
+    fn apply_ops(mut self, ops: dyn Iterator<Item = Operation>) -> Self {
+        while let Some(op) = ops.next() {
+            match op {
+                Operation::Cd(dir) => match dir.as_str() {
+                    "/" => (),
+                    ".." => break,
+                    // name => self.directories.push(
+                    //     Directory {
+                    //         name: name.to_owned(),
+                    //         files: vec![],
+                    //         directories: vec![],
+                    //     }
+                    //     .apply_ops(ops),
+                    // ),
+                    name => self.directories.push(Directory::new(name).apply_ops(ops)),
+                },
+                Operation::Ls(inodes) => inodes.iter().for_each(|i| self.add(i)),
+                _ => (),
+            }
         }
+        self
+        // match ops.next() {
+        //     Some(Operation::Ls(inodes)) => {
+        //         inodes
+        //             .iter()
+        //             .for_each(|i| self.add(i));
+        //         self.apply_ops(ops)
+        //     },
+        //     Some(Operation::Cd(target)) if target.eq("..") => ops,
+        //     Some(Operation::Cd(target)) => { //self.directories.iter().find(|d| d.name.eq(target)).unwrap().apply_ops(ops),
+        //         for dir in self.directories.iter() {
+        //             if dir.name.to_string().eq(&target) {
+        //                 return dir.clone().apply_ops(ops);
+        //             }
+        //         }
+        //         panic!("Fuck this");
+        //     },
+        //     None => ops,
+        // }
     }
 
 }
@@ -141,9 +161,6 @@ fn main() {
         ops.push(Operation::Ls(ls));
     }
 
-    let foo = ops.iter();
-
-
     let mut filesystem = Directory::new("/");
 
     // for line in input {
@@ -154,9 +171,8 @@ fn main() {
     //         }
     //     }
     // }
-    let foo = ops.iter().map(|op| op);
-    filesystem.apply_ops(foo);
 
+    filesystem.apply_ops(ops);
 
     //println!("{:?}", ops)
     for op in ops {
