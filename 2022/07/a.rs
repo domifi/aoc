@@ -52,7 +52,7 @@ impl Directory {
         }
     }
 
-    fn apply_ops(mut self, ops: dyn Iterator<Item = Operation>) -> Self {
+    fn apply_ops(mut self, ops: &mut dyn Iterator<Item = Operation>) -> Self {
         while let Some(op) = ops.next() {
             match op {
                 Operation::Cd(dir) => match dir.as_str() {
@@ -162,20 +162,7 @@ fn main() {
     }
 
     let mut filesystem = Directory::new("/");
+    filesystem = filesystem.apply_ops(&mut ops.into_iter());
 
-    // for line in input {
-    //     if line.starts_with("$ cd") {
-    //         let name = line.split_whitespace().last().unwrap();
-    //         if name == "/" {
-    //             continue;
-    //         }
-    //     }
-    // }
-
-    filesystem.apply_ops(ops);
-
-    //println!("{:?}", ops)
-    for op in ops {
-        println!("{:?}", op)
-    }
+    println!("{:#?}", filesystem)
 }
