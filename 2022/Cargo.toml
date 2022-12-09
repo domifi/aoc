@@ -58,3 +58,7 @@ path = "08/a.rs"
 [[bin]]
 name = "08b"
 path = "08/b.rs"
+
+[[bin]]
+name = "09a"
+path = "09/a.rs"
