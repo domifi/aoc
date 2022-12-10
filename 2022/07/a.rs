@@ -58,19 +58,7 @@ impl Directory {
                 Operation::Cd(dir) => match dir.as_str() {
                     "/" => (),
                     ".." => break,
-                    // name => self.directories.push(Directory::new(name).apply_ops(ops)),
-                    name => {
-                        let found = self
-                            .directories
-                            .swap_remove(self
-                                .directories
-                                .iter()
-                                .position(|d| d.name.eq(name)
-                            ).unwrap()
-                        );
-
-                    self.directories.push(found.apply_ops(ops))
-                    },
+                    name => self.directories.push(Directory::new(name).apply_ops(ops)),
                 },
                 Operation::Ls(inodes) => inodes.iter().for_each(|i| self.add(i)),
             }
@@ -80,8 +68,7 @@ impl Directory {
 
     fn dir_sizes(&self) -> Vec<u64> {
         let mut subdirs = self.directories.iter().flat_map(|dir| dir.dir_sizes()).collect::<Vec<_>>();
-        let this_dir = self.files.iter().map(|f| f.size()).sum::<u64>()
-            + subdirs.iter().sum::<u64>();
+        let this_dir = self.size();
         subdirs.push(this_dir);
         subdirs
     }
@@ -152,6 +139,5 @@ fn main() {
     filesystem = filesystem.apply_ops(&mut ops.into_iter());
     let sizes = filesystem.dir_sizes();
 
-    println!("{:?}", sizes.iter().filter(|&&s| s <= 100_000).sum::<u64>())
-    // println!("{:?}", sizes.iter().collect::<Vec<_>>())
+    println!("{}", sizes.iter().filter(|&&s| s <= 100_000).sum::<u64>())
 }
