@@ -37,9 +37,9 @@ fn main() {
             println!();
         }
         if (crt_pos - sprite_pos).abs() <= 1 {
-            print!("█");
+            print!("██");
         } else {
-            print!(" ");
+            print!("  ");
         }
         crt_pos += 1;
     }
