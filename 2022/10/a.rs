@@ -26,11 +26,11 @@ fn main() {
             Op::Noop => register,
             Op::Addx(i) => { register += i; register },
         }
-    }).zip(1..);
+    }).zip(2..);
 
     let mut result = states.nth(20-2).unwrap().0 * 20;
     while let Some((value, index)) = states.nth(40-1) {
-        result += value * (index+1);
+        result += value * index;
     }
 
     println!("{}", result)
